@@ -1,0 +1,1 @@
+# amplify-vite-react-template-main
