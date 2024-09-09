@@ -32,7 +32,7 @@ export default function App() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24 dark:text-white">
       <div>
-        <h1 className="text-3xl font-bold text-center mb-4">Haiku Generator</h1>
+        <h1 className="text-3xl font-bold text-center mb-4">Amazon Chef Chatbot</h1>
 
         <form className="mb-4 self-center max-w-[500px]" onSubmit={sendPrompt}>
           <input
