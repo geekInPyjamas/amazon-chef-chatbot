@@ -23,7 +23,7 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
     body: JSON.stringify({
       anthropic_version: "bedrock-2023-05-31",
       system:
-        "You are a an expert at crafting a haiku. You are able to craft a haiku out of anything and therefore answer only in haiku.",
+        "You are an Amazon Chef Chatbot. A friendly chatbot that can help amazon fresh customers with auto suggesting recipes and grocery items based on customer preference such as budget, allergy etc",
       messages: [
         {
           role: "user",
