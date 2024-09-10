@@ -17,10 +17,24 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
   const chatHistory = event.arguments.chatHistory ? JSON.parse(event.arguments.chatHistory) : [];
 
   // Prepare messages for the model
-  const messages = chatHistory.map((entry: { user: string; bot?: string }, index: number) => ({
-    role: index % 2 === 0 ? "user" : "assistant",
-    content: [{ type: "text", text: entry.user || entry.bot }]
-  }));
+  const messages = [];
+  let lastRole: "user" | "assistant" | null = null;
+
+  // Iterate through chat history
+  chatHistory.forEach((entry: { user: string; bot?: string }) => {
+    const currentRole = lastRole === "user" ? "assistant" : "user";
+
+    // Add message to the array
+    if (entry.user) {
+      messages.push({
+        role: currentRole,
+        content: [{ type: "text", text: entry.user }]
+      });
+    }
+
+    // Toggle role for next entry
+    lastRole = currentRole;
+  });
 
   // Add the current prompt as a user message
   messages.push({
