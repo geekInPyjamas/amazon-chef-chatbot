@@ -17,7 +17,7 @@ const hardcodedResponses = [
   "This is a random response 5",
 ];
 
-const useHardcodedResponses = true; // Change this flag to toggle
+const useHardcodedResponses = false; // Change this flag to toggle
 
 export default function App() {
   const [chatHistory, setChatHistory] = useState<{ user: string; bot: string }[]>([]);
