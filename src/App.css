@@ -8,8 +8,8 @@
 
 /* Chat Container Wrapper */
 .chat-container-wrapper {
-  width: 90%; /* Use 90% width for responsiveness */
-  max-width: 1200px; /* Increased maximum width for larger screens */
+  width: calc(100% - 1px); /* Device width minus 40px */
+  max-width: calc(100% - 1px); /* Device width minus 40px */
   background-color: #F5F3EF; /* Light offwhite */
   border-radius: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -17,12 +17,11 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  width:80vh;
-  height: 80vh; /* Initial height for mid-sized screens */
-  min-height: 400px; /* Minimum height for very small screens */
-  max-height: 80vh; /* Maximum height for larger screens */
+  height: calc(100vh - 1px); /* Device height minus 40px */
+  max-height: calc(100vh - 40px); /* Device height minus 40px */
   transition: height 0.3s ease, width 0.3s ease; /* Smooth transition for height and width changes */
 }
+
 
 /* Chat Container */
 .chat-container {
