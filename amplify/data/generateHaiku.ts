@@ -17,11 +17,12 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
   const chatHistory = event.arguments.chatHistory ? JSON.parse(event.arguments.chatHistory) : [];
 
   // Prepare messages for the model
-  const messages = chatHistory.map((entry: { user: string; bot?: string }) => ({
-    role: "user",
-    content: [{ type: "text", text: entry.user }]
+  const messages = chatHistory.map((entry: { user: string; bot?: string }, index: number) => ({
+    role: index % 2 === 0 ? "user" : "assistant",
+    content: [{ type: "text", text: entry.user || entry.bot }]
   }));
 
+  // Add the current prompt as a user message
   messages.push({
     role: "user",
     content: [{ type: "text", text: prompt }]
