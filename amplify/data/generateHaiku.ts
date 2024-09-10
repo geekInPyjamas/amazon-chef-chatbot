@@ -5,15 +5,27 @@ import {
   InvokeModelCommandInput,
 } from "@aws-sdk/client-bedrock-runtime";
 
-// initialize bedrock runtime client
+// Initialize Bedrock Runtime Client
 const client = new BedrockRuntimeClient();
 
 export const handler: Schema["generateHaiku"]["functionHandler"] = async (
   event,
   context
 ) => {
-  // User prompt
+  // User prompt and chat history
   const prompt = event.arguments.prompt;
+  const chatHistory = event.arguments.chatHistory ? JSON.parse(event.arguments.chatHistory) : [];
+
+  // Prepare messages for the model
+  const messages = chatHistory.map((entry: { user: string; bot?: string }) => ({
+    role: "user",
+    content: [{ type: "text", text: entry.user }]
+  }));
+
+  messages.push({
+    role: "user",
+    content: [{ type: "text", text: prompt }]
+  });
 
   // Invoke model
   const input = {
@@ -22,19 +34,8 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
     accept: "application/json",
     body: JSON.stringify({
       anthropic_version: "bedrock-2023-05-31",
-      system:
-        "You are an Amazon Chef Chatbot. A friendly chatbot that can help amazon fresh customers with auto suggesting recipes and grocery items based on customer preference such as budget, allergy etc",
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: prompt,
-            },
-          ],
-        },
-      ],
+      system: "You are an Amazon Chef Chatbot. A friendly chatbot that can help amazon fresh customers with auto suggesting recipes and grocery items based on customer preference such as budget, allergy etc",
+      messages,
       max_tokens: 1000000,
       temperature: 0.5,
     }),

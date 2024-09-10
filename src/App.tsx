@@ -22,40 +22,43 @@ const useHardcodedResponses = false; // Change this flag to toggle
 export default function App() {
   const [chatHistory, setChatHistory] = useState<{ user: string; bot: string }[]>([]);
   const [prompt, setPrompt] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false); // State for loading animation
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const chatHistoryRef = useRef<HTMLDivElement>(null);
 
   const sendPrompt = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    setChatHistory((prevHistory) => [...prevHistory, { user: prompt, bot: "" }]); // Show user input immediately
+
+    setChatHistory((prevHistory) => [...prevHistory, { user: prompt, bot: "" }]);
     setPrompt("");
-    setIsLoading(true); // Start loading animation
+    setIsLoading(true);
 
     if (useHardcodedResponses) {
       const randomResponse = hardcodedResponses[Math.floor(Math.random() * hardcodedResponses.length)];
       setTimeout(() => {
         setChatHistory((prevHistory) => {
           const newHistory = [...prevHistory];
-          newHistory[newHistory.length - 1].bot = randomResponse; // Update latest entry with bot response
+          newHistory[newHistory.length - 1].bot = randomResponse;
           return newHistory;
         });
-        setIsLoading(false); // Stop loading animation
+        setIsLoading(false);
       }, 1000);
     } else {
-      const { data, errors } = await client.queries.generateHaiku({ prompt });
+      const { data, errors } = await client.queries.generateHaiku({ 
+        prompt,
+        chatHistory: JSON.stringify(chatHistory) // Pass chat history
+      });
 
       if (!errors) {
         setChatHistory((prevHistory) => {
           const newHistory = [...prevHistory];
-          newHistory[newHistory.length - 1].bot = data || ""; // Update latest entry with bot response
+          newHistory[newHistory.length - 1].bot = data || "";
           return newHistory;
         });
-        setIsLoading(false); // Stop loading animation
+        setIsLoading(false);
       } else {
         console.log(errors);
-        setIsLoading(false); // Stop loading animation on error
+        setIsLoading(false);
       }
     }
   };
