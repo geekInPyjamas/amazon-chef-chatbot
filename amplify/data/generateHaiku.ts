@@ -35,7 +35,7 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
           ],
         },
       ],
-      max_tokens: 1000,
+      max_tokens: 1000000,
       temperature: 0.5,
     }),
   } as InvokeModelCommandInput;
@@ -44,7 +44,6 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
 
   const response = await client.send(command);
 
-  // Parse the response and return the generated haiku
   const data = JSON.parse(Buffer.from(response.body).toString());
 
   return data.content[0].text;

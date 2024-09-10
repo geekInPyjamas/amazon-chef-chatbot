@@ -17,51 +17,45 @@ const hardcodedResponses = [
   "This is a random response 5",
 ];
 
-const useHardcodedResponses = false; //CHANGE THIS TO TRUE WHEN TESTING LOCALLY
+const useHardcodedResponses = true; // Change this flag to toggle
 
 export default function App() {
   const [chatHistory, setChatHistory] = useState<{ user: string; bot: string }[]>([]);
   const [prompt, setPrompt] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false); // Loading state
+  const [isLoading, setIsLoading] = useState<boolean>(false); // State for loading animation
 
   const chatHistoryRef = useRef<HTMLDivElement>(null);
 
   const sendPrompt = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // Immediately show user input
-    setChatHistory((prevHistory) => [...prevHistory, { user: prompt, bot: "" }]);
+    
+    setChatHistory((prevHistory) => [...prevHistory, { user: prompt, bot: "" }]); // Show user input immediately
     setPrompt("");
-    setLoading(true); // Start loading animation
-
-    // Concatenate previous history into a single string
-    const historyString = chatHistory
-      .map((entry) => `User: ${entry.user}\nBot: ${entry.bot}`)
-      .join("\n");
-
-    const fullPrompt = `${historyString}\nUser: ${prompt}`; // New full prompt with old history
+    setIsLoading(true); // Start loading animation
 
     if (useHardcodedResponses) {
       const randomResponse = hardcodedResponses[Math.floor(Math.random() * hardcodedResponses.length)];
       setTimeout(() => {
         setChatHistory((prevHistory) => {
-          const lastMessage = { ...prevHistory[prevHistory.length - 1], bot: randomResponse };
-          return [...prevHistory.slice(0, -1), lastMessage];
+          const newHistory = [...prevHistory];
+          newHistory[newHistory.length - 1].bot = randomResponse; // Update latest entry with bot response
+          return newHistory;
         });
-        setLoading(false); // Stop loading animation
-      }, 1000); // Simulate delay
+        setIsLoading(false); // Stop loading animation
+      }, 1000);
     } else {
-      const { data, errors } = await client.queries.generateHaiku({ prompt: fullPrompt });
+      const { data, errors } = await client.queries.generateHaiku({ prompt });
 
       if (!errors) {
         setChatHistory((prevHistory) => {
-          const lastMessage = { ...prevHistory[prevHistory.length - 1], bot: data || "" };
-          return [...prevHistory.slice(0, -1), lastMessage];
+          const newHistory = [...prevHistory];
+          newHistory[newHistory.length - 1].bot = data || ""; // Update latest entry with bot response
+          return newHistory;
         });
-        setLoading(false); // Stop loading animation
+        setIsLoading(false); // Stop loading animation
       } else {
         console.log(errors);
-        setLoading(false); // Stop loading animation on error
+        setIsLoading(false); // Stop loading animation on error
       }
     }
   };
@@ -83,7 +77,7 @@ export default function App() {
                   <strong>{entry.user}</strong>
                 </div>
                 <div className="chat-bubble bot-message">
-                  {entry.bot || (loading && index === chatHistory.length - 1 && <span className="loading-dots">...</span>)}
+                  {entry.bot || (isLoading && <div className="loading-dots"><span>.</span><span>.</span><span>.</span></div>)}
                 </div>
               </div>
             ))}
@@ -92,7 +86,7 @@ export default function App() {
             <textarea
               className="chat-input"
               rows={2}
-              placeholder="Type your message..."
+              placeholder="Amazon Chef at your service...."
               name="prompt"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
@@ -103,9 +97,7 @@ export default function App() {
                 }
               }}
             />
-            <button type="submit" className="chat-submit-button">
-              ➤
-            </button>
+            <button type="submit" className="chat-submit-button">➤</button>
           </form>
         </div>
       </div>
