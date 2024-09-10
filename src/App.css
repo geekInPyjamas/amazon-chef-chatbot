@@ -8,21 +8,31 @@
 
 /* Chat Container Wrapper */
 .chat-container-wrapper {
-  width: 100%;
-  max-width: 1000px;
-  min-width: 450px;
+  width: 90%; /* Use 90% width for responsiveness */
+  max-width: 1200px; /* Increased maximum width for larger screens */
   background-color: #F5F3EF; /* Light offwhite */
   border-radius: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Prevent overflow for rounded edges */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  width:80vh;
+  height: 80vh; /* Initial height for mid-sized screens */
+  min-height: 400px; /* Minimum height for very small screens */
+  max-height: 80vh; /* Maximum height for larger screens */
+  transition: height 0.3s ease, width 0.3s ease; /* Smooth transition for height and width changes */
 }
 
 /* Chat Container */
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 80vh;
-  max-height: 80vh;
+  height: 100%;
   overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid #4b5563;
+  padding: 1rem;
 }
 
 /* Chat History */
@@ -32,6 +42,38 @@
   padding: 1rem;
   background-color: #F5F3EF; /* Light offwhite */
   border-radius: 20px 20px 0 0;
+  scrollbar-width: thin;
+  scrollbar-color: #4b5563 #F5F3EF;
+}
+
+/* Media Queries for Dynamic Chat Window Size */
+@media (max-height: 600px) {
+  /* For very small screen heights */
+  .chat-container-wrapper {
+    height: 50vh; /* Smaller height for very small screens */
+  }
+}
+
+@media (min-height: 900px) {
+  /* For larger screen heights */
+  .chat-container-wrapper {
+    height: 70vh; /* Taller height for larger screens */
+  }
+}
+
+
+/* Custom Scrollbar Styles for Chrome, Safari, and Edge */
+.chat-history::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-history::-webkit-scrollbar-thumb {
+  background-color: #4b5563; /* Dark gray scrollbar */
+  border-radius: 10px; /* Rounded scrollbar */
+}
+
+.chat-history::-webkit-scrollbar-track {
+  background-color: #F5F3EF; /* Match background */
 }
 
 /* Chat Entry Container */
@@ -51,7 +93,6 @@
   line-height: 1.4;
   font-size: 16px;
   display: block;
-  /* Ensure no overflow outside of the chat container */
   box-sizing: border-box;
 }
 
@@ -61,8 +102,8 @@
   color: white;
   border-radius: 20px 20px 0 20px;
   margin-left: 0;
-  text-align: left; /* Left align text */
-  font-style: italic; /* Italicize text */
+  text-align: left;
+  font-style: italic;
 }
 
 .bot-message {
@@ -70,7 +111,7 @@
   color: #f3f4f6;
   border-radius: 20px 20px 20px 0;
   margin-left: 20px;
-  text-align: right; /* Right align text */
+  text-align: right;
 }
 
 /* Chat Input Form */
@@ -92,7 +133,7 @@
   border: 1px solid #4b5563;
   background-color: #FFFFFF; /* White */
   color: #012900; /* Fresh green text */
-  margin-right: 8px; /* Space between textarea and button */
+  margin-right: 8px;
 }
 
 .chat-input:focus {
@@ -118,5 +159,4 @@
 
 .chat-submit-button:focus {
   outline: none;
-  box-shadow: 0 0 0 2px #2563eb; /* Blue focus ring */
-}
+  box-shadow: 0 0 0 2px #2563eb

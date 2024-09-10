@@ -3,13 +3,12 @@ import { generateClient } from "aws-amplify/api";
 import { Schema } from "../amplify/data/resource";
 import { Amplify } from "aws-amplify";
 import outputs from "../amplify_outputs.json";
-import "./App.css"
+import "./App.css";
 
 Amplify.configure(outputs);
 
 const client = generateClient<Schema>();
 
-// Define an array of hardcoded responses
 const hardcodedResponses = [
   "This is a random response 1",
   "This is a random response 2",
@@ -18,38 +17,55 @@ const hardcodedResponses = [
   "This is a random response 5",
 ];
 
-// Flag to toggle between hardcoded responses and API call
-const useHardcodedResponses = false; // Change this flag to toggle
+const useHardcodedResponses = false; //CHANGE THIS TO TRUE WHEN TESTING LOCALLY
 
 export default function App() {
   const [chatHistory, setChatHistory] = useState<{ user: string; bot: string }[]>([]);
   const [prompt, setPrompt] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false); // Loading state
 
-  // Create a ref for the chat history container
   const chatHistoryRef = useRef<HTMLDivElement>(null);
 
   const sendPrompt = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Immediately show user input
+    setChatHistory((prevHistory) => [...prevHistory, { user: prompt, bot: "" }]);
+    setPrompt("");
+    setLoading(true); // Start loading animation
+
+    // Concatenate previous history into a single string
+    const historyString = chatHistory
+      .map((entry) => `User: ${entry.user}\nBot: ${entry.bot}`)
+      .join("\n");
+
+    const fullPrompt = `${historyString}\nUser: ${prompt}`; // New full prompt with old history
+
     if (useHardcodedResponses) {
       const randomResponse = hardcodedResponses[Math.floor(Math.random() * hardcodedResponses.length)];
-      setChatHistory((prevHistory) => [...prevHistory, { user: prompt, bot: randomResponse }]);
-      setPrompt("");
+      setTimeout(() => {
+        setChatHistory((prevHistory) => {
+          const lastMessage = { ...prevHistory[prevHistory.length - 1], bot: randomResponse };
+          return [...prevHistory.slice(0, -1), lastMessage];
+        });
+        setLoading(false); // Stop loading animation
+      }, 1000); // Simulate delay
     } else {
-      const { data, errors } = await client.queries.generateHaiku({
-        prompt,
-      });
+      const { data, errors } = await client.queries.generateHaiku({ prompt: fullPrompt });
 
       if (!errors) {
-        setChatHistory((prevHistory) => [...prevHistory, { user: prompt, bot: data || "" }]);
-        setPrompt("");
+        setChatHistory((prevHistory) => {
+          const lastMessage = { ...prevHistory[prevHistory.length - 1], bot: data || "" };
+          return [...prevHistory.slice(0, -1), lastMessage];
+        });
+        setLoading(false); // Stop loading animation
       } else {
         console.log(errors);
+        setLoading(false); // Stop loading animation on error
       }
     }
   };
 
-  // Scroll to bottom of chat history whenever it updates
   useEffect(() => {
     if (chatHistoryRef.current) {
       chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
@@ -60,17 +76,14 @@ export default function App() {
     <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gray-900">
       <div className="chat-container-wrapper">
         <div className="chat-container">
-          <div
-            ref={chatHistoryRef}
-            className="chat-history"
-          >
+          <div ref={chatHistoryRef} className="chat-history">
             {chatHistory.map((entry, index) => (
               <div key={index} className="chat-entry">
                 <div className="chat-bubble user-message">
-                  <strong> {entry.user}</strong>
+                  <strong>{entry.user}</strong>
                 </div>
                 <div className="chat-bubble bot-message">
-                  {entry.bot}
+                  {entry.bot || (loading && index === chatHistory.length - 1 && <span className="loading-dots">...</span>)}
                 </div>
               </div>
             ))}
@@ -84,17 +97,14 @@ export default function App() {
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
+                if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  sendPrompt(e as any); // Cast event to any to match form submission
+                  sendPrompt(e as any);
                 }
               }}
             />
-            <button
-              type="submit"
-              className="chat-submit-button"
-            >
-              ➤ {/* Right-facing arrow icon */}
+            <button type="submit" className="chat-submit-button">
+              ➤
             </button>
           </form>
         </div>
