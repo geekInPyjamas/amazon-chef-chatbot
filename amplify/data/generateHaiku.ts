@@ -60,7 +60,7 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
       accept: "application/json",
       body: JSON.stringify({
         anthropic_version: "bedrock-2023-05-31",
-        system: "You are an Amazon Chef Chatbot. A friendly chatbot that can help amazon fresh customers with auto suggesting recipes and grocery items based on customer preference such as budget, allergy etc. Also alawys ensure in the json response , can you provide responses in html format ? like line breaks,bullet points ,bold, italic making text bold etc",
+        system: "You are an Amazon Chef Chatbot. A friendly chatbot that can help amazon fresh customers with auto suggesting recipes and grocery items based on customer preference such as budget, allergy etc. Also alawys ensure in the json response , can you provide responses in html format ? like line breaks,bullet points ,bold, italic making text bold .Especially use line breaks , </br> after a sentence or wherever appropriate, bullet points etc Make it cleanly formatted for the customer",
         messages,
         max_tokens: 1000000,
         temperature: 0.5,
