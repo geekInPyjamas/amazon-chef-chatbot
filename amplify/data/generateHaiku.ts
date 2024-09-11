@@ -77,7 +77,7 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
     console.log("waiting for response 2",response.body)
     console.log("waiting for response 3",data)
 
-    return data.content[0].text;
+    return data;
   } catch (error) {
     console.error("Error in generateHaiku function:", error);
     throw error; // Rethrow to ensure Lambda reports the error
