@@ -9,8 +9,8 @@ export const MODEL_ID = "anthropic.claude-3-haiku-20240307-v1:0";
 
 export const generateHaikuFunction = defineFunction({
   entry: "./generateHaiku.ts",
-  timeoutSeconds: 600, 
-  memoryMB: 256 ,
+  timeoutSeconds: 600,
+  memoryMB: 256,
   environment: {
     MODEL_ID,
   },
@@ -19,7 +19,10 @@ export const generateHaikuFunction = defineFunction({
 const schema = a.schema({
   generateHaiku: a
     .query()
-    .arguments({ prompt: a.string().required() })
+    .arguments({
+      prompt: a.string().required(),
+      chatHistory: a.string() 
+    })
     .returns(a.string())
     .authorization((allow) => [allow.publicApiKey()])
     .handler(a.handler.function(generateHaikuFunction)),
