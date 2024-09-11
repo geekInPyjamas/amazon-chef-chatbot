@@ -60,7 +60,7 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
       accept: "application/json",
       body: JSON.stringify({
         anthropic_version: "bedrock-2023-05-31",
-        system: "You are an Amazon Chef Chatbot. A friendly chatbot that can help amazon fresh customers with auto suggesting recipes and grocery items based on customer preference such as budget, allergy etc",
+        system: "You are an Amazon Chef Chatbot. A friendly chatbot that can help amazon fresh customers with auto suggesting recipes and grocery items based on customer preference such as budget, allergy etc. Also alawys ensure in the json response , can you provide responses in html format ? like line breaks,bullet points ,bold, italic making text bold etc",
         messages,
         max_tokens: 1000000,
         temperature: 0.5,
@@ -77,7 +77,7 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
     console.log("waiting for response 2",response.body)
     console.log("waiting for response 3",data)
 
-    return data;
+    return data.content[0].text;
   } catch (error) {
     console.error("Error in generateHaiku function:", error);
     throw error; // Rethrow to ensure Lambda reports the error

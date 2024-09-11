@@ -11,11 +11,8 @@ Amplify.configure(outputs);
 const client = generateClient<Schema>();
 
 const hardcodedResponses = [
-  "This is a random response 1",
+  "<ul> <li><b>Find recipes</b> based on your preferences and dietary needs</li> <li><b>Suggest grocery items</b> to add to your Amazon Fresh cart</li> <li><b>Answer any questions</b> you have about Amazon Fresh services</li> </ul>",
   "This is a random response 2",
-  "This is a random response 3",
-  "This is a random response 4",
-  "This is a random response 5",
 ];
 
 const useHardcodedResponses = false; // Change this flag to toggle
@@ -100,8 +97,12 @@ export default function App() {
                     <strong>{entry.user}</strong>
                   </div>
                   <div className="chat-bubble bot-message">
-                    {entry.bot || (isLoading && <div className="loading-dots"><span>.</span><span>.</span><span>.</span></div>)}
-                  </div>
+  {entry.bot ? (
+    <div dangerouslySetInnerHTML={{ __html: entry.bot }} />
+  ) : (
+    isLoading && <div className="loading-dots"><span>.</span><span>.</span><span>.</span></div>
+  )}
+</div>
                 </div>
               ))}
             </div>
