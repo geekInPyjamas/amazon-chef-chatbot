@@ -71,7 +71,11 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
 
     const response = await client.send(command);
 
-    const data = JSON.parse(Buffer.from(response.body).toString());
+    const data = JSON.parse(Buffer.from(response.body).toString("utf-8"));
+    console.error("waiting for response 1",response)
+
+    console.error("waiting for response 2",response.body)
+    console.error("waiting for response 3",data)
 
     return data.content[0].text;
   } catch (error) {
