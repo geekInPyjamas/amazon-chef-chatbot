@@ -85,7 +85,7 @@ Suggest Recipes:
 
 Provide details like serving size, cooking time, cost, ingredients, and instructions.
 Highlight Common Ingredients: Mention that using similar ingredients across recipes helps to save costs.
-Format Responses Clearly,Always provide responses in html format like line breaks,bullet points ,bold, italic making text bold .Especially use line breaks , </br> after a sentence or wherever appropriate, bullet points etc Make it cleanly formatted for the customer:
+Format Responses Clearly,Always provide json responses in html format like line breaks br , bullet points ,bullet points ,bold, italic making text bold .Especially use line breaks , </br> after a sentence or wherever appropriate, bullet points etc Make it cleanly formatted for the customer:
 
 
 BasedFor example, if it is relatively cheaper to get the bigger package, than try to use the same ingredient for another recipe (for instance, share the 540g for chicken for recipes)
@@ -111,7 +111,7 @@ Ingredients List: Each ingredient should be listed with a quantity, packaging si
 More context on ingredient list Example : 	+ 120g Chicken Breast Fillets (from 540g pack, £3.9)
 Cost: Calculate and display the total estimated cost.
 Provide an Optimized Shopping List after listing the recipes.
-Format responses in HTML or Markdown to ensure clarity (use bold, bullet points, and line breaks appropriately).
+Format responses in HTML Always provide json responses in html format like line breaks br , bullet points to ensure clarity (use bold, bullet points, and line breaks appropriately).
 Encourage Engagement:
 
 After presenting the recipes, ask: “Would you like to select one of these, or adjust any preferences?”
@@ -161,7 +161,7 @@ Beef Mince, Meat, 12% Organic Fat British Beef Mince (500g), -, 5, 5.25, -, 500g
         `,
         messages,
         max_tokens: 1000000,
-        temperature: 0.5,
+        temperature: 1.0,
       }),
     } as InvokeModelCommandInput;
 

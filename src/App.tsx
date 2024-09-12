@@ -75,7 +75,7 @@ export default function App() {
     setIsNewUser(isUserNew);
   
     setChatHistory(isUserNew ? [
-      { user: "", bot: `Welcome to Amazon Fresh, ${usernameInput}. Let's make your first order! \n Would you like me to ask you a few quick questions to explore some recipe options and order groceries` }
+      { user: "", bot: `Welcome to Amazon Fresh, ${usernameInput}. Let's make your first order! \n Would you like me to ask you a few quick questions to explore some recipe options and order groceries?` }
     ] : [
       { user: "", bot: `Welcome back, ${usernameInput}. Would you like me to ask you a few quick questions to explore some recipe options and order groceries?` }
     ]);
