@@ -11,7 +11,7 @@ Amplify.configure(outputs);
 const client = generateClient<Schema>();
 
 const hardcodedResponses = [
-  "<ul> <li><button data-action='Find recipes'>Find recipes</button></li> <li><button data-action='Suggest grocery items'>Suggest grocery items</button></li> <li><button data-action='Answer any questions'>Answer any questions</button></li> </ul>",
+  "<ul> <li><button data-action='Find recipes'>Find recipes1</button></li> <li><button data-action='Suggest grocery items1'>Suggest grocery items</button></li> <li><button data-action='Answer any questions'>Answer any questions</button></li> </ul>",
   "This is a random response 2",
 ];
 
@@ -75,9 +75,9 @@ export default function App() {
     setIsNewUser(isUserNew);
   
     setChatHistory(isUserNew ? [
-      { user: "", bot: `Welcome to Amazon Fresh, ${usernameInput}. Let's make your first order! \n Would you like me to ask you a few quick questions to explore some recipe options and order groceries?` }
+      { user: "", bot: `Welcome to Amazon Fresh, ${usernameInput}. Let's make your first order! \n Would you like me to ask you a few quick questions to explore some recipe options and order groceries? </br> <button data-action="yes">Yes</button></br> <button data-action="no">No</button>` }
     ] : [
-      { user: "", bot: `Welcome back, ${usernameInput}. Would you like me to ask you a few quick questions to explore some recipe options and order groceries?` }
+      { user: "", bot: `Welcome back, ${usernameInput}. Would you like me to ask you a few quick questions to explore some recipe options and order groceries?  </br> <button data-action="yes">Yes</button></br> <button data-action="no">No</button>` }
     ]);
   };
 
@@ -221,7 +221,9 @@ export default function App() {
                   onClick={(e) => {
                     const target = e.target as HTMLElement;
                     if (target.tagName === "BUTTON") {
-                      handleButtonClick(target.getAttribute("data-action") || "");
+                      const buttonElement = target as HTMLButtonElement;
+                      const buttonText = buttonElement.textContent || buttonElement.innerText;
+                      handleButtonClick(buttonText);
                     }
                   }}
                 />
