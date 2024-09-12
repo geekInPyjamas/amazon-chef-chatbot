@@ -30,84 +30,83 @@ export default function App() {
     postCode: "",
     allergies: ""
   });
+  
+  // Assuming userData is stored in local storage
+  const [userData, setUserData] = useState<{ [key: string]: { age: string; postCode: string; allergies: string } }>({});
 
   const chatHistoryRef = useRef<HTMLDivElement>(null);
+  const [typingMessage, setTypingMessage] = useState<string>("");
 
-  // Effect to handle scrolling to the bottom of the chat window after every update
   useEffect(() => {
     if (chatHistoryRef.current) {
       chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
     }
   }, [chatHistory, isLoading]);
 
-  // Load user data from local storage
-  const loadUserData = () => {
-    const storedData = localStorage.getItem('userData');
-    return storedData ? JSON.parse(storedData) : {};
-  };
+  useEffect(() => {
+    if (isLoading) {
+      simulateStreaming();
+    }
+  }, [isLoading]);
 
-  const [userData, setUserData] = useState<{ [key: string]: { age: string; postCode: string; allergies: string } }>(loadUserData());
+  const simulateStreaming = () => {
+    const latestBotMessage = chatHistory[chatHistory.length - 1]?.bot || "";
+    let index = 0;
+    const speed = 5; // Reduced speed for faster typing
 
-  const saveUserData = (data: { [key: string]: { age: string; postCode: string; allergies: string } }) => {
-    localStorage.setItem('userData', JSON.stringify(data));
-    setUserData(data);
+    const interval = setInterval(() => {
+      setTypingMessage(latestBotMessage.substring(0, index));
+      index++;
+
+      if (index > latestBotMessage.length) {
+        clearInterval(interval);
+        setIsLoading(false);
+      }
+    }, speed);
   };
 
   const handleLogin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const usernameInput = (e.currentTarget.elements[0] as HTMLInputElement).value;
-    // Check if user is new or returning
     const isUserNew = !(usernameInput in userData);
   
     setUserName(usernameInput);
     setIsLoggedIn(true);
     setIsNewUser(isUserNew);
   
-    // Initialize chat history with a valid user message
     setChatHistory(isUserNew ? [
-      { user: "", bot: `Welcome to Amazon Fresh, ${usernameInput}. Let's make your first order!` }
+      { user: "", bot: `Welcome to Amazon Fresh, ${usernameInput}. Let's make your first order! \n Would you like me to ask you a few quick questions to explore some recipe options and order groceries` }
     ] : [
-      { user: "", bot: `Welcome back, ${usernameInput}. What do you want to eat today?` }
+      { user: "", bot: `Welcome back, ${usernameInput}. Would you like me to ask you a few quick questions to explore some recipe options and order groceries?` }
     ]);
   };
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Save user data
     const updatedUserData = { ...userData, [userName]: formData };
     saveUserData(updatedUserData);
     setIsNewUser(false);
-    setFormData({ age: "", postCode: "", allergies: "" }); // Clear form data
+    setFormData({ age: "", postCode: "", allergies: "" });
     setChatHistory([
       { user: "", bot: `Welcome to Amazon Fresh, ${userName}. Let's make your first order!` }
     ]);
   };
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
   const sendPrompt = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
-    if (prompt.trim() === "") {
-      return; // Prevent submission if the prompt is empty
-    }
-  
-    // Ensure the first message is from the user
+
+    if (prompt.trim() === "") return;
+
     const updatedChatHistory = [...chatHistory, { user: prompt, bot: "" }];
-    
-    // Ensure the first message is correctly formatted with the "user" role
     const chatHistoryForLambda = updatedChatHistory.map(entry => ({
       role: "user",
       content: entry.user
     }));
-  
+
     setChatHistory(updatedChatHistory);
     setPrompt("");
     setIsLoading(true);
-  
+
     if (useHardcodedResponses) {
       const randomResponse = hardcodedResponses[Math.floor(Math.random() * hardcodedResponses.length)];
       setTimeout(() => {
@@ -116,21 +115,23 @@ export default function App() {
           newHistory[newHistory.length - 1].bot = randomResponse;
           return newHistory;
         });
-        setIsLoading(false);
+        setTypingMessage(""); // Reset typing message for new animation
+        setIsLoading(true); // Trigger animation
       }, 1000);
     } else {
       const { data, errors } = await client.queries.generateHaiku({
         prompt,
-        chatHistory: JSON.stringify(chatHistoryForLambda) // Pass formatted chat history
+        chatHistory: JSON.stringify(chatHistoryForLambda)
       });
-  
+
       if (!errors) {
         setChatHistory((prevHistory) => {
           const newHistory = [...prevHistory];
           newHistory[newHistory.length - 1].bot = data || "";
           return newHistory;
         });
-        setIsLoading(false);
+        setTypingMessage(""); // Reset typing message for new animation
+        setIsLoading(true); // Trigger animation
       } else {
         console.log(errors);
         setIsLoading(false);
@@ -138,56 +139,53 @@ export default function App() {
     }
   };
 
-  const renderLoginPage = () => (
-    <div className="login-page">
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="text"
-          placeholder="Username"
-          required
-        />
-        <button type="submit">Login</button>
-      </form>
-    </div>
-  );
+  const saveUserData = (data: { [key: string]: { age: string; postCode: string; allergies: string } }) => {
+    // Save data to local storage or a backend service
+    localStorage.setItem("userData", JSON.stringify(data));
+    setUserData(data);
+  };
 
   const renderNewUserForm = () => (
-    <div className="new-user-form">
-      <h2>Welcome!</h2>
-      <form onSubmit={handleFormSubmit}>
-        <label>
-          Age:
-          <input
-            type="text"
-            name="age"
-            value={formData.age}
-            onChange={handleFormChange}
-            required
-          />
-        </label>
-        <label>
-          Post Code:
-          <input
-            type="text"
-            name="postCode"
-            value={formData.postCode}
-            onChange={handleFormChange}
-            required
-          />
-        </label>
-        <label>
-          Allergies:
-          <input
-            type="text"
-            name="allergies"
-            value={formData.allergies}
-            onChange={handleFormChange}
-          />
-        </label>
-        <button type="submit">Submit</button>
-      </form>
-    </div>
+    <form className="user-form" onSubmit={handleFormSubmit}>
+      <label htmlFor="age">Age:</label>
+      <input
+        id="age"
+        type="text"
+        placeholder="Age"
+        value={formData.age}
+        onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+      />
+      <label htmlFor="postcode">Postcode:</label>
+      <input
+        id="postcode"
+        type="text"
+        placeholder="Postcode"
+        value={formData.postCode}
+        onChange={(e) => setFormData({ ...formData, postCode: e.target.value })}
+      />
+      <label htmlFor="allergies">Allergies:</label>
+      <input
+        id="allergies"
+        type="text"
+        placeholder="Allergies"
+        value={formData.allergies}
+        onChange={(e) => setFormData({ ...formData, allergies: e.target.value })}
+      />
+      <button type="submit">Submit</button>
+    </form>
+  );
+  const renderLoginPage = () => (
+    <form className="login-form" onSubmit={handleLogin}>
+      <label htmlFor="username">Username:</label>
+      <input
+        id="username"
+        type="text"
+        placeholder="Enter username"
+        value={userName}
+        onChange={(e) => setUserName(e.target.value)}
+      />
+      <button type="submit">Login</button>
+    </form>
   );
 
   const renderChatWindow = () => (
@@ -201,10 +199,10 @@ export default function App() {
               </div>
               <div className="chat-bubble bot-message">
                 <img src="/chef_logo.png" alt="Amazon Chef Logo" className="anthropic-logo" />
-                {entry.bot ? (
-                  <div dangerouslySetInnerHTML={{ __html: entry.bot }} />
+                {index === chatHistory.length - 1 && isLoading ? (
+                  <div>{typingMessage}</div>
                 ) : (
-                  isLoading && <div className="loading-dots"><span>.</span><span>.</span><span>.</span></div>
+                  <div dangerouslySetInnerHTML={{ __html: entry.bot }} />
                 )}
               </div>
             </div>
@@ -228,7 +226,7 @@ export default function App() {
           <button
             type="submit"
             className={`chat-submit-button ${isLoading || !prompt.trim() ? 'disabled' : ''}`}
-            disabled={!prompt.trim()} // Disable button if prompt is empty
+            disabled={!prompt.trim()}
           >
             {isLoading ? (
               <div className="loading-dots">
@@ -253,7 +251,7 @@ export default function App() {
           <img src="/Amazon_Chef_Logo_2.jpg" alt="Amazon Chef Logo" className="logo" />
         </div>
         <nav className={`nav-links ${isMenuOpen ? 'open' : ''}`}>
-          <a href="#" onClick={() => { setIsLoggedIn(false); setIsNewUser(true); }} className="nav-link">Chatbot</a>
+          <a href="#" onClick={() => { setIsLoggedIn(false); setIsNewUser(true); }} className="nav-link">Home</a>
           <a href="#recipes" className="nav-link">Recipes</a>
           <a href="#cart" className="nav-link">Cart</a>
         </nav>

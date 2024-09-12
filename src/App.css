@@ -36,6 +36,7 @@
   gap: 1rem;
   transition: max-height 0.3s ease;
   overflow: hidden;
+  padding-right: 50px;
 }
 
 .nav-links.open {
@@ -97,6 +98,9 @@
   overflow: hidden; /* Prevent content from being clipped */
   font-size: smaller;
   font-weight: bold;
+  padding-left: 100px;
+  padding-right: 100px;
+
 }
 
 .footer-link {
@@ -291,7 +295,8 @@
   color: #FFFFFF; /* White */
   border: none;
   border-radius: 12px;
-  height: 38px;
+  margin-bottom: 20px;
+  height: 50px;
   cursor: pointer;
   transition: transform 0.3s ease, background-color 0.3s ease; /* Add transition for transform */
 }
@@ -421,3 +426,62 @@
   vertical-align: middle; /* Align vertically with the text */
   margin-bottom: 5px;
 }
+
+/* General form styles */
+form {
+
+}
+
+/* Common styles for input fields in forms */
+form input[type="text"] {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  
+  max-width: 400px;
+  margin: auto;
+}
+
+form input[type="text"]:focus {
+  border-color: #108805;
+  box-shadow: 0 0 5px rgba(16, 136, 5, 0.3);
+}
+
+/* Styles for buttons in forms */
+form button {
+  background-color: #108805;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+form button:hover {
+  background-color: #085001;
+  transform: scale(1.05);
+}
+
+form button:disabled {
+  background-color: #dcdcdc;
+  cursor: not-allowed;
+}
+
+/* Label styles */
+form label {
+  font-size: 16px;
+  margin-bottom: 50px;
+margin: 1em;  color: #012900;
+  font-weight: bold;
+}
+
