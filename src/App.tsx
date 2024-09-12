@@ -94,19 +94,20 @@ export default function App() {
 
   const sendPrompt = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     if (prompt.trim() === "") return;
-
+  
     const updatedChatHistory = [...chatHistory, { user: prompt, bot: "" }];
     const chatHistoryForLambda = updatedChatHistory.map(entry => ({
       role: "user",
       content: entry.user
     }));
-
+  
+    // Show loading dots immediately after input
     setChatHistory(updatedChatHistory);
     setPrompt("");
-    setIsLoading(true);
-
+    setIsLoading(true); // Show loading dots right after input is submitted
+  
     if (useHardcodedResponses) {
       const randomResponse = hardcodedResponses[Math.floor(Math.random() * hardcodedResponses.length)];
       setTimeout(() => {
@@ -116,25 +117,30 @@ export default function App() {
           return newHistory;
         });
         setTypingMessage(""); // Reset typing message for new animation
-        setIsLoading(true); // Trigger animation
+        setIsLoading(false); // Stop loading animation
       }, 1000);
     } else {
-      const { data, errors } = await client.queries.generateHaiku({
-        prompt,
-        chatHistory: JSON.stringify(chatHistoryForLambda)
-      });
-
-      if (!errors) {
-        setChatHistory((prevHistory) => {
-          const newHistory = [...prevHistory];
-          newHistory[newHistory.length - 1].bot = data || "";
-          return newHistory;
+      try {
+        const { data, errors } = await client.queries.generateHaiku({
+          prompt,
+          chatHistory: JSON.stringify(chatHistoryForLambda)
         });
-        setTypingMessage(""); // Reset typing message for new animation
-        setIsLoading(true); // Trigger animation
-      } else {
-        console.log(errors);
-        setIsLoading(false);
+  
+        if (!errors) {
+          setChatHistory((prevHistory) => {
+            const newHistory = [...prevHistory];
+            newHistory[newHistory.length - 1].bot = data || "";
+            return newHistory;
+          });
+          setTypingMessage(""); // Reset typing message for new animation
+          setIsLoading(false); // Stop loading animation
+        } else {
+          console.log(errors);
+          setIsLoading(false); // Ensure loading is stopped if there's an error
+        }
+      } catch (error) {
+        console.error("API call failed", error);
+        setIsLoading(false); // Ensure loading is stopped if there's an error
       }
     }
   };
