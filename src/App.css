@@ -481,3 +481,23 @@ margin: 1em;  color: #012900;
   font-weight: bold;
 }
 
+button {
+  background-color: #108805; /* Amazon green background */
+  color: #FFFFFF; /* White text color */
+  border: none;
+  border-radius: 8px; /* Rounded corners */
+  padding: 12px 24px; /* Padding for button size */
+  font-size: 16px; /* Font size */
+  font-weight: bold; /* Bold text */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition for background and transform */
+  display: inline-block; /* Inline-block for layout consistency */
+  text-align: center; /* Center text inside button */
+  margin: 8px; /* Space around buttons */
+}
+
+/* Button Hover State */
+button:hover {
+  background-color: #085001; /* Darker green on hover */
+  transform: scale(1.05); /* Slight zoom effect */
+}

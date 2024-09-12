@@ -11,7 +11,7 @@ Amplify.configure(outputs);
 const client = generateClient<Schema>();
 
 const hardcodedResponses = [
-  "<ul> <li><b>Find recipes</b> based on your preferences and dietary needs</li> <li><b>Suggest grocery items</b> to add to your Amazon Fresh cart</li> <li><b>Answer any questions</b> you have about Amazon Fresh services</li> </ul>",
+  "<ul> <li><button data-action='Find recipes'>Find recipes</button></li> <li><button data-action='Suggest grocery items'>Suggest grocery items</button></li> <li><button data-action='Answer any questions'>Answer any questions</button></li> </ul>",
   "This is a random response 2",
 ];
 
@@ -92,9 +92,9 @@ export default function App() {
     ]);
   };
 
-  const sendPrompt = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-  
+  const sendPrompt = async (e?: FormEvent<HTMLFormElement>) => {
+    if (e) e.preventDefault(); // Prevent default form submission if triggered by event
+    
     if (prompt.trim() === "") return;
   
     const updatedChatHistory = [...chatHistory, { user: prompt, bot: "" }];
@@ -151,6 +151,16 @@ export default function App() {
     setUserData(data);
   };
 
+  const handleButtonClick = (action: string) => {
+    setPrompt(action);
+    setTimeout(() => {
+      const submitButton = document.querySelector('.chat-submit-button') as HTMLButtonElement;
+      if (submitButton && !submitButton.disabled) {
+        submitButton.click();
+      }
+    }, 100); // Adjust the delay as needed
+  };
+
   const renderNewUserForm = () => (
     <form className="user-form" onSubmit={handleFormSubmit}>
       <label htmlFor="age">Age:</label>
@@ -194,6 +204,8 @@ export default function App() {
     </form>
   );
 
+
+
   const renderChatWindow = () => (
     <div className="chat-container-wrapper">
       <div className="chat-container">
@@ -204,12 +216,16 @@ export default function App() {
                 <strong>{entry.user}</strong>
               </div>
               <div className="chat-bubble bot-message">
-                <img src="/chef_logo.png" alt="Amazon Chef Logo" className="anthropic-logo" />
-                {index === chatHistory.length - 1 && isLoading ? (
-                  <div>{typingMessage}</div>
-                ) : (
-                  <div dangerouslySetInnerHTML={{ __html: entry.bot }} />
-                )}
+                <span
+                  dangerouslySetInnerHTML={{ __html: entry.bot }}
+                  onClick={(e) => {
+                    const target = e.target as HTMLElement;
+                    if (target.tagName === "BUTTON") {
+                      handleButtonClick(target.getAttribute("data-action") || "");
+                    }
+                  }}
+                />
+                {isLoading && typingMessage}
               </div>
             </div>
           ))}
