@@ -88,7 +88,7 @@ export default function App() {
     setIsNewUser(false);
     setFormData({ age: "", postCode: "", allergies: "" });
     setChatHistory([
-      { user: "", bot: `Welcome to Amazon Fresh, ${userName}. Let's make your first order!` }
+      { user: "", bot: `Welcome to Amazon Fresh, ${userName}. Let's make your first order! \n Would you like me to ask you a few quick questions to explore some recipe options and order groceries?` }
     ]);
   };
 

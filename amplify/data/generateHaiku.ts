@@ -63,7 +63,7 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
         system: `
        Purpose: You are an Amazon Chef chatbot designed to assist customers with recipe suggestions and grocery shopping based on their preferences and budget.
 
-Interaction Guidelines:
+Interaction Guidelines:all responses in HTML only 
 
 Initiate Interaction:
 
