@@ -58,20 +58,17 @@ export default function App() {
     const usernameInput = (e.currentTarget.elements[0] as HTMLInputElement).value;
     // Check if user is new or returning
     const isUserNew = !(usernameInput in userData);
-
+  
     setUserName(usernameInput);
     setIsLoggedIn(true);
     setIsNewUser(isUserNew);
-
-    if (isUserNew) {
-      setChatHistory([
-        { user: "", bot: `Welcome to Amazon Fresh, ${usernameInput}. Let's make your first order!` }
-      ]);
-    } else {
-      setChatHistory([
-        { user: "", bot: `Welcome back, ${usernameInput}. What do you want to eat today?` }
-      ]);
-    }
+  
+    // Initialize chat history with a valid user message
+    setChatHistory(isUserNew ? [
+      { user: "", bot: `Welcome to Amazon Fresh, ${usernameInput}. Let's make your first order!` }
+    ] : [
+      { user: "", bot: `Welcome back, ${usernameInput}. What do you want to eat today?` }
+    ]);
   };
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -93,15 +90,24 @@ export default function App() {
 
   const sendPrompt = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     if (prompt.trim() === "") {
       return; // Prevent submission if the prompt is empty
     }
-
-    setChatHistory((prevHistory) => [...prevHistory, { user: prompt, bot: "" }]);
+  
+    // Ensure the first message is from the user
+    const updatedChatHistory = [...chatHistory, { user: prompt, bot: "" }];
+    
+    // Ensure the first message is correctly formatted with the "user" role
+    const chatHistoryForLambda = updatedChatHistory.map(entry => ({
+      role: "user",
+      content: entry.user
+    }));
+  
+    setChatHistory(updatedChatHistory);
     setPrompt("");
     setIsLoading(true);
-
+  
     if (useHardcodedResponses) {
       const randomResponse = hardcodedResponses[Math.floor(Math.random() * hardcodedResponses.length)];
       setTimeout(() => {
@@ -115,9 +121,9 @@ export default function App() {
     } else {
       const { data, errors } = await client.queries.generateHaiku({
         prompt,
-        chatHistory: JSON.stringify(chatHistory) // Pass chat history
+        chatHistory: JSON.stringify(chatHistoryForLambda) // Pass formatted chat history
       });
-
+  
       if (!errors) {
         setChatHistory((prevHistory) => {
           const newHistory = [...prevHistory];
