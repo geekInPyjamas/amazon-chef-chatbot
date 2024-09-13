@@ -501,3 +501,92 @@ button:hover {
   background-color: #085001; /* Darker green on hover */
   transform: scale(1.05); /* Slight zoom effect */
 }
+
+/* Position the animation container below the submit button */
+.animation-container {
+  position: relative;
+  margin-top: 20px; /* Adjust as needed */
+}
+
+.question-container {
+  text-align: center;
+}
+
+.main-question {
+  font-size: 1.5em;
+  text-align: center;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.extra-questions {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.extra-question {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+}
+
+.extra-question.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.extra-question.hide {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.animation-logo {
+  display: block;
+  margin: 20px auto;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+}
+
+.animation-logo.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Keyframes for animations */
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
