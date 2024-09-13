@@ -17,6 +17,7 @@ const hardcodedResponses = [
 
 const useHardcodedResponses = false; // Change this flag to toggle
 
+
 export default function App() {
   const [chatHistory, setChatHistory] = useState<{ user: string; bot: string }[]>([]);
   const [prompt, setPrompt] = useState<string>("");
@@ -190,19 +191,83 @@ export default function App() {
       <button type="submit">Submit</button>
     </form>
   );
+
+
+  const ExtraQuestionsAnimation = () => {
+    const [isLogoVisible, setIsLogoVisible] = useState(false);
+    
+    useEffect(() => {
+      const extraQuestions = document.querySelectorAll('.extra-question');
+      
+      const showQuestions = () => {
+        extraQuestions.forEach((question, index) => {
+          setTimeout(() => {
+            question.classList.add('fade-in');
+          }, index * 1000); // Adjust delay to slow transition
+        });
+      };
+  
+      const hideQuestions = () => {
+        extraQuestions.forEach((question) => {
+          question.classList.remove('fade-in');
+        });
+      };
+  
+      const startAnimation = () => {
+        setIsLogoVisible(false);
+        showQuestions();
+        setTimeout(() => {
+          hideQuestions();
+          setIsLogoVisible(true);
+        }, 6000); // Adjust duration based on total time for showing questions
+      };
+  
+      startAnimation();
+  
+      // Loop the animation
+      const interval = setInterval(() => {
+        startAnimation();
+      }, 10000); // Adjust loop interval to be longer than the animation cycle
+      
+      return () => clearInterval(interval);
+    }, []);
+  
+    return (
+      <div className="question-container">
+        <p className="main-question">I want to meet my eating goals</p>
+        <div className="extra-questions">
+          <p className="extra-question">BUT what should I eat?</p>
+          <p className="extra-question">Cooking requires so much planning</p>
+          <p className="extra-question">Where do you find recipes?</p>
+          <p className="extra-question">I have to follow my budget ugh</p>
+          <p className="extra-question">I don’t have time! , But Amazon Chef is Here !</p>
+          <img src="/Amazon_Chef_Logo_2.jpg" alt="Amazon Chef Logo" className={`extra-question logo ${isLogoVisible ? 'show' : ''}`} />
+        </div>
+      </div>
+    );
+  };
+  
+  
+
+
   const renderLoginPage = () => (
-    <form className="login-form" onSubmit={handleLogin}>
-      <label htmlFor="username">Username:</label>
-      <input
-        id="username"
-        type="text"
-        placeholder="Enter username"
-        value={userName}
-        onChange={(e) => setUserName(e.target.value)}
-      />
-      <button type="submit">Login</button>
-    </form>
+    <div>
+      <form className="login-form" onSubmit={handleLogin}>
+        <label htmlFor="username">Username:</label>
+        <input
+          id="username"
+          type="text"
+          placeholder="Enter username"
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+        />
+        <button type="submit">Login</button>
+      </form>
+      <ExtraQuestionsAnimation />
+    </div>
   );
+  
+
 
 
 
