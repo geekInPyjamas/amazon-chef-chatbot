@@ -78,6 +78,10 @@ export default function App() {
     if (prompt.trim() === "") return;
 
     const updatedChatHistory = [...chatHistory, { user: prompt, bot: "" }];
+    const chatHistoryForLambda = updatedChatHistory.map(entry => ({
+      role: "user",
+      content: entry.user
+    }));
     setChatHistory(updatedChatHistory);
     setPrompt("");
     setIsLoading(true); // Show loading dots right after input is submitted
@@ -98,7 +102,7 @@ export default function App() {
         try {
             const { data, errors } = await client.queries.generateHaiku({
                 prompt,
-                chatHistory: JSON.stringify(updatedChatHistory.filter(entry => entry.bot)),  // Send only complete conversations
+                chatHistory: JSON.stringify(chatHistoryForLambda),  // Send only complete conversations
               });
 
             if (!errors) {
