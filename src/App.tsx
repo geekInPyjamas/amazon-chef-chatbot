@@ -37,18 +37,13 @@ export default function App() {
 
   const chatHistoryRef = useRef<HTMLDivElement>(null);
   const [typingMessage, setTypingMessage] = useState<string>("");
+  const [isMessageLoading, setIsMessageLoading] = useState<boolean>(false); // State for bot message loading
 
   useEffect(() => {
     if (chatHistoryRef.current) {
       chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
     }
   }, [chatHistory, isLoading]);
-
-  useEffect(() => {
-    if (isLoading) {
-      simulateStreaming();
-    }
-  }, [isLoading]);
 
   const simulateStreaming = () => {
     const latestBotMessage = chatHistory[chatHistory.length - 1]?.bot || "";
@@ -94,21 +89,16 @@ export default function App() {
   };
 
   const sendPrompt = async (e?: FormEvent<HTMLFormElement>) => {
-    if (e) e.preventDefault(); // Prevent default form submission if triggered by event
-    
+    if (e) e.preventDefault();
+
     if (prompt.trim() === "") return;
-  
+
     const updatedChatHistory = [...chatHistory, { user: prompt, bot: "" }];
-    const chatHistoryForLambda = updatedChatHistory.map(entry => ({
-      role: "user",
-      content: entry.user
-    }));
-  
-    // Show loading dots immediately after input
     setChatHistory(updatedChatHistory);
     setPrompt("");
     setIsLoading(true); // Show loading dots right after input is submitted
-  
+    setIsMessageLoading(true); // Loading state for bot message
+
     if (useHardcodedResponses) {
       const randomResponse = hardcodedResponses[Math.floor(Math.random() * hardcodedResponses.length)];
       setTimeout(() => {
@@ -117,34 +107,36 @@ export default function App() {
           newHistory[newHistory.length - 1].bot = randomResponse;
           return newHistory;
         });
-        setTypingMessage(""); // Reset typing message for new animation
-        setIsLoading(false); // Stop loading animation
+        setIsLoading(false); // Stop loading dots on submit button
+        setIsMessageLoading(false); // Stop loading dots in bot message and trigger fade-in
       }, 1000);
     } else {
       try {
         const { data, errors } = await client.queries.generateHaiku({
           prompt,
-          chatHistory: JSON.stringify(chatHistoryForLambda)
+          chatHistory: JSON.stringify(updatedChatHistory)
         });
-  
+
         if (!errors) {
           setChatHistory((prevHistory) => {
             const newHistory = [...prevHistory];
             newHistory[newHistory.length - 1].bot = data || "";
             return newHistory;
           });
-          setTypingMessage(""); // Reset typing message for new animation
-          setIsLoading(false); // Stop loading animation
+          setIsLoading(false); // Stop loading dots on submit button
+          setIsMessageLoading(false); // Stop loading dots in bot message and trigger fade-in
         } else {
-          console.log(errors);
-          setIsLoading(false); // Ensure loading is stopped if there's an error
+          console.error(errors);
+          setIsLoading(false); 
+          setIsMessageLoading(false);
         }
       } catch (error) {
         console.error("API call failed", error);
-        setIsLoading(false); // Ensure loading is stopped if there's an error
+        setIsLoading(false);
+        setIsMessageLoading(false);
       }
     }
-  };
+};
 
   const saveUserData = (data: { [key: string]: { age: string; postCode: string; allergies: string } }) => {
     // Save data to local storage or a backend service
@@ -280,19 +272,22 @@ export default function App() {
               <div className="chat-bubble user-message">
                 <strong>{entry.user}</strong>
               </div>
-              <div className="chat-bubble bot-message">
-                <span
+              <div className={`chat-bubble bot-message ${!isMessageLoading && index === chatHistory.length - 1 ? "fade-in" : ""}`}>
+                {isMessageLoading && index === chatHistory.length - 1 ? (
+                  <div className="loading-dots"><span>.</span><span>.</span><span>.</span></div>
+                ) : (
+                  <span
                   dangerouslySetInnerHTML={{ __html: entry.bot }}
                   onClick={(e) => {
-                    const target = e.target as HTMLElement;
-                    if (target.tagName === "BUTTON") {
-                      const buttonElement = target as HTMLButtonElement;
-                      const buttonText = buttonElement.textContent || buttonElement.innerText;
-                      handleButtonClick(buttonText);
-                    }
+                      const target = e.target as HTMLElement;
+                      if (target.tagName === "BUTTON") {
+                          const buttonElement = target as HTMLButtonElement;
+                          const buttonText = buttonElement.textContent || buttonElement.innerText;
+                          handleButtonClick(buttonText);
+                      }
                   }}
-                />
-                {isLoading && typingMessage}
+              />
+                )}
               </div>
             </div>
           ))}
@@ -329,6 +324,7 @@ export default function App() {
       </div>
     </div>
   );
+
 
   return (
     <div className="app-container">
