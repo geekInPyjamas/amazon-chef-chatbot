@@ -22,9 +22,10 @@ const messages = [];
 let lastRole: "user" | "assistant" | null = null;
 
 // Add chat history messages
+// Add chat history messages
 chatHistory.forEach((entry: { user: string; bot?: string }, index: number) => {
-  // Handle user messages
   if (entry.user) {
+    // Handle user messages
     messages.push({
       role: "user",
       content: [{ type: "text", text: entry.user }]
@@ -49,12 +50,18 @@ chatHistory.forEach((entry: { user: string; bot?: string }, index: number) => {
   }
 });
 
-// Add the current prompt as a user message, ensuring it uses the 'user' role
-if (prompt && prompt !== "start") {  // Skip any 'start' message
-  messages.push({
-    role: "user",
-    content: [{ type: "text", text: prompt }]
-  });
+// Check if there are user messages before adding the current prompt
+if (prompt && prompt !== "start") { // Skip any 'start' message
+  // Ensure the prompt is added only if there are existing user messages
+  if (messages.length > 0 && lastRole === "user") {
+    messages.push({
+      role: "user",
+      content: [{ type: "text", text: prompt }]
+    });
+  } else {
+    console.error("First message must be a user message.");
+    throw new Error("First message must be a user message.");
+  }
 }
 
 // Log the prepared messages for debugging
