@@ -17,43 +17,29 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
     const prompt = event.arguments.prompt;
     const chatHistory = event.arguments.chatHistory ? JSON.parse(event.arguments.chatHistory) : [];
 
-// Prepare messages for the model
-const messages = [];
-let lastRole: "user" | "assistant" | null = null;
+  // Prepare messages for the model
+  const messages = [];
+  let lastRole: "user" | "assistant" | null = null;
 
-// Add chat history messages
-chatHistory.forEach((entry: { user: string; bot?: string }, index: number) => {
-  // Handle user messages
-  if (entry.user) {
-    messages.push({
-      role: "user",
-      content: [{ type: "text", text: entry.user }]
-    });
-    lastRole = "user"; // Update lastRole to user
+  // Ensure the current prompt is the first message
+  messages.push({ role: "user", content: [{ type: "text", text: prompt }] });
+  
+  // Add chat history messages
+  chatHistory.forEach((entry: { user: string; bot?: string }) => {
+    if (entry.user) {
+      messages.push({ role: "user", content: [{ type: "text", text: entry.user }] });
+      lastRole = "user";
 
-    // Ensure there is a corresponding assistant message if available
-    if (entry.bot) {
-      messages.push({
-        role: "assistant",
-        content: [{ type: "text", text: entry.bot }]
-      });
-      lastRole = "assistant"; // Update lastRole to assistant
+      if (entry.bot) {
+        messages.push({ role: "assistant", content: [{ type: "text", text: entry.bot }] });
+        lastRole = "assistant";
+      }
+    } else if (entry.bot) {
+      messages.push({ role: "assistant", content: [{ type: "text", text: entry.bot }] });
+      lastRole = "assistant";
     }
-  } else if (entry.bot) {
-    // If there's a bot message but no user message, just add the assistant message
-    messages.push({
-      role: "assistant",
-      content: [{ type: "text", text: entry.bot }]
-    });
-    lastRole = "assistant"; // Update lastRole to assistant
-  }
-});
+  });
 
-// Add the current prompt as a user message, ensuring it uses the 'user' role
-messages.push({
-  role: "user",
-  content: [{ type: "text", text: prompt }]
-});
 
 // Log the prepared messages for debugging
 console.log("Prepared messages:", messages);
