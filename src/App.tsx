@@ -59,6 +59,7 @@ export default function App() {
     ] : [
       { user: "start", bot: `Welcome back, ${usernameInput}. Would you like me to ask you a few quick questions to explore some recipe options and order groceries?  </br> <button data-action="yes">Yes</button></br> <button data-action="no">No</button>` }
     ]);
+  };
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
