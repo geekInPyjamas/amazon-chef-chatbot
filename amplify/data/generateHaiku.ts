@@ -18,33 +18,39 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
     const chatHistory = event.arguments.chatHistory ? JSON.parse(event.arguments.chatHistory) : [];
 
     // Prepare messages for the model
-    const messages = [];
-    let lastRole: "user" | "assistant" | null = null;
+const messages = [];
+let lastRole: "user" | "assistant" | null = null;
 
-    // Add chat history messages
+// Add chat history messages
 chatHistory.forEach((entry: { user: string; bot?: string }, index: number) => {
-  // Ensure the first role is 'user' for the first message
-  const currentRole = lastRole === null ? "user" : lastRole === "user" ? "assistant" : "user";
-
-  // Add user message
-  if (entry.user) {
+  // Always start with 'user' for the first message
+  if (index === 0) {
     messages.push({
-      role: currentRole,
+      role: "user",
       content: [{ type: "text", text: entry.user }]
     });
-  }
+    lastRole = "user"; // Set lastRole to user
+  } else {
+    // For subsequent entries, alternate roles
+    const currentRole = lastRole === "user" ? "assistant" : "user";
+    
+    // Add user message
+    if (entry.user) {
+      messages.push({
+        role: "user",
+        content: [{ type: "text", text: entry.user }]
+      });
+    }
 
-  // Update last role
-  lastRole = currentRole;
+    // Add bot message if it exists
+    if (entry.bot) {
+      messages.push({
+        role: "assistant",
+        content: [{ type: "text", text: entry.bot }]
+      });
+    }
 
-  // Add bot message if it exists
-  if (entry.bot) {
-    const botRole = currentRole === "user" ? "assistant" : "user";
-    messages.push({
-      role: botRole,
-      content: [{ type: "text", text: entry.bot }]
-    });
-    lastRole = botRole;  // Ensure the lastRole alternates correctly
+    lastRole = currentRole; // Update lastRole
   }
 });
 
