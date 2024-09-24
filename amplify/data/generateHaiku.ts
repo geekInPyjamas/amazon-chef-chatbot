@@ -17,55 +17,41 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
     const prompt = event.arguments.prompt;
     const chatHistory = event.arguments.chatHistory ? JSON.parse(event.arguments.chatHistory) : [];
 
-// Prepare messages for the model
-const messages = [];
-let lastRole: "user" | "assistant" | null = null;
+    // Prepare messages for the model
+    const messages = [];
+    let lastRole: "user" | "assistant" | null = null;
 
-// Add chat history messages
-// Add chat history messages
-chatHistory.forEach((entry: { user: string; bot?: string }, index: number) => {
-  if (entry.user) {
-    // Handle user messages
-    messages.push({
-      role: "user",
-      content: [{ type: "text", text: entry.user }]
+    // Add chat history messages
+    chatHistory.forEach((entry: { user: string; bot?: string }) => {
+      const currentRole = lastRole === "user" ? "assistant" : "user";
+
+      // Ensure role alternation and add messages
+      if (entry.user) {
+        messages.push({
+          role: currentRole,
+          content: [{ type: "text", text: entry.user }]
+        });
+      }
+
+      // Toggle role for next entry
+      lastRole = currentRole;
+
+      if (entry.bot) {
+        messages.push({
+          role: currentRole === "user" ? "assistant" : "user",
+          content: [{ type: "text", text: entry.bot }]
+        });
+        lastRole = currentRole === "user" ? "assistant" : "user";
+      }
     });
-    lastRole = "user"; // Update lastRole to user
 
-    // Ensure there is a corresponding assistant message if available
-    if (entry.bot) {
-      messages.push({
-        role: "assistant",
-        content: [{ type: "text", text: entry.bot }]
-      });
-      lastRole = "assistant"; // Update lastRole to assistant
-    }
-  } else if (entry.bot) {
-    // If there's a bot message but no user message, just add the assistant message
-    messages.push({
-      role: "assistant",
-      content: [{ type: "text", text: entry.bot }]
-    });
-    lastRole = "assistant"; // Update lastRole to assistant
-  }
-});
-
-// Check if there are user messages before adding the current prompt
-if (prompt && prompt !== "start") { // Skip any 'start' message
-  // Ensure the prompt is added only if there are existing user messages
-  if (messages.length > 0 && lastRole === "user") {
+    // Add the current prompt as a user message
     messages.push({
       role: "user",
       content: [{ type: "text", text: prompt }]
     });
-  } else {
-    console.error("First message must be a user message.");
-    throw new Error("First message must be a user message.");
-  }
-}
 
-// Log the prepared messages for debugging
-console.log("Prepared messages:", messages);
+    console.log("Prepared messages:", messages);
 
     // Invoke model
     const input = {
@@ -133,7 +119,8 @@ Constraints:
 
 Stick closely to the customer's budget, allowing a soft margin of +/- £2-3.
 Strictly respect allergy information and dietary restrictions.
-Optimize ingredients to minimize waste and reduce costs.`,
+Optimize ingredients to minimize waste and reduce costs.
+        `,
         messages,
         max_tokens: 1000000,
         temperature: 1.0,
