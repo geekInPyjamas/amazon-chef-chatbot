@@ -50,10 +50,12 @@ chatHistory.forEach((entry: { user: string; bot?: string }, index: number) => {
 });
 
 // Add the current prompt as a user message, ensuring it uses the 'user' role
-messages.push({
-  role: "user",
-  content: [{ type: "text", text: prompt }]
-});
+if (prompt && prompt !== "start") {  // Skip any 'start' message
+  messages.push({
+    role: "user",
+    content: [{ type: "text", text: prompt }]
+  });
+}
 
 // Log the prepared messages for debugging
 console.log("Prepared messages:", messages);

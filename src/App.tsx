@@ -55,11 +55,10 @@ export default function App() {
     setIsNewUser(isUserNew);
   
     setChatHistory(isUserNew ? [
-      { user: "", bot: `Welcome to Amazon Fresh, ${usernameInput}. Let's make your first order! \n Would you like me to ask you a few quick questions to explore some recipe options and order groceries? </br> <button data-action="yes">Yes</button></br> <button data-action="no">No</button>` }
+      { user: "start", bot: `Welcome to Amazon Fresh, ${usernameInput}. Let's make your first order! \n Would you like me to ask you a few quick questions to explore some recipe options and order groceries? </br> <button data-action="yes">Yes</button></br> <button data-action="no">No</button>` }
     ] : [
-      { user: "", bot: `Welcome back, ${usernameInput}. Would you like me to ask you a few quick questions to explore some recipe options and order groceries?  </br> <button data-action="yes">Yes</button></br> <button data-action="no">No</button>` }
+      { user: "start", bot: `Welcome back, ${usernameInput}. Would you like me to ask you a few quick questions to explore some recipe options and order groceries?  </br> <button data-action="yes">Yes</button></br> <button data-action="no">No</button>` }
     ]);
-  };
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
