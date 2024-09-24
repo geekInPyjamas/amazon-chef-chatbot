@@ -36,7 +36,6 @@ export default function App() {
   const [userData, setUserData] = useState<{ [key: string]: { age: string; postCode: string; allergies: string } }>({});
 
   const chatHistoryRef = useRef<HTMLDivElement>(null);
-  const [typingMessage, setTypingMessage] = useState<string>("");
   const [isMessageLoading, setIsMessageLoading] = useState<boolean>(false); // State for bot message loading
 
   useEffect(() => {
@@ -45,21 +44,6 @@ export default function App() {
     }
   }, [chatHistory, isLoading]);
 
-  const simulateStreaming = () => {
-    const latestBotMessage = chatHistory[chatHistory.length - 1]?.bot || "";
-    let index = 0;
-    const speed = 5; // Reduced speed for faster typing
-
-    const interval = setInterval(() => {
-      setTypingMessage(latestBotMessage.substring(0, index));
-      index++;
-
-      if (index > latestBotMessage.length) {
-        clearInterval(interval);
-        setIsLoading(false);
-      }
-    }, speed);
-  };
 
   const handleLogin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -100,41 +84,41 @@ export default function App() {
     setIsMessageLoading(true); // Loading state for bot message
 
     if (useHardcodedResponses) {
-      const randomResponse = hardcodedResponses[Math.floor(Math.random() * hardcodedResponses.length)];
-      setTimeout(() => {
-        setChatHistory((prevHistory) => {
-          const newHistory = [...prevHistory];
-          newHistory[newHistory.length - 1].bot = randomResponse;
-          return newHistory;
-        });
-        setIsLoading(false); // Stop loading dots on submit button
-        setIsMessageLoading(false); // Stop loading dots in bot message and trigger fade-in
-      }, 1000);
+        const randomResponse = hardcodedResponses[Math.floor(Math.random() * hardcodedResponses.length)];
+        setTimeout(() => {
+            setChatHistory((prevHistory) => {
+                const newHistory = [...prevHistory];
+                newHistory[newHistory.length - 1].bot = randomResponse;
+                return newHistory;
+            });
+            setIsLoading(false); // Stop loading dots on submit button
+            setIsMessageLoading(false); // Stop loading dots in bot message and trigger fade-in
+        }, 1000);
     } else {
-      try {
-        const { data, errors } = await client.queries.generateHaiku({
-          prompt,
-          chatHistory: JSON.stringify(updatedChatHistory)
-        });
+        try {
+            const { data, errors } = await client.queries.generateHaiku({
+                prompt,
+                chatHistory: JSON.stringify(updatedChatHistory)
+            });
 
-        if (!errors) {
-          setChatHistory((prevHistory) => {
-            const newHistory = [...prevHistory];
-            newHistory[newHistory.length - 1].bot = data || "";
-            return newHistory;
-          });
-          setIsLoading(false); // Stop loading dots on submit button
-          setIsMessageLoading(false); // Stop loading dots in bot message and trigger fade-in
-        } else {
-          console.error(errors);
-          setIsLoading(false); 
-          setIsMessageLoading(false);
+            if (!errors) {
+                setChatHistory((prevHistory) => {
+                    const newHistory = [...prevHistory];
+                    newHistory[newHistory.length - 1].bot = data || "";
+                    return newHistory;
+                });
+                setIsLoading(false); // Stop loading dots on submit button
+                setIsMessageLoading(false); // Stop loading dots in bot message and trigger fade-in
+            } else {
+                console.error(errors);
+                setIsLoading(false); 
+                setIsMessageLoading(false);
+            }
+        } catch (error) {
+            console.error("API call failed", error);
+            setIsLoading(false);
+            setIsMessageLoading(false);
         }
-      } catch (error) {
-        console.error("API call failed", error);
-        setIsLoading(false);
-        setIsMessageLoading(false);
-      }
     }
 };
 
@@ -265,65 +249,65 @@ export default function App() {
 
   const renderChatWindow = () => (
     <div className="chat-container-wrapper">
-      <div className="chat-container">
-        <div ref={chatHistoryRef} className="chat-history">
-          {chatHistory.map((entry, index) => (
-            <div key={index} className="chat-entry">
-              <div className="chat-bubble user-message">
-                <strong>{entry.user}</strong>
-              </div>
-              <div className={`chat-bubble bot-message ${!isMessageLoading && index === chatHistory.length - 1 ? "fade-in" : ""}`}>
-                {isMessageLoading && index === chatHistory.length - 1 ? (
-                  <div className="loading-dots"><span>.</span><span>.</span><span>.</span></div>
-                ) : (
-                  <span
-                  dangerouslySetInnerHTML={{ __html: entry.bot }}
-                  onClick={(e) => {
-                      const target = e.target as HTMLElement;
-                      if (target.tagName === "BUTTON") {
-                          const buttonElement = target as HTMLButtonElement;
-                          const buttonText = buttonElement.textContent || buttonElement.innerText;
-                          handleButtonClick(buttonText);
-                      }
-                  }}
-              />
-                )}
-              </div>
+        <div className="chat-container">
+            <div ref={chatHistoryRef} className="chat-history">
+                {chatHistory.map((entry, index) => (
+                    <div key={index} className="chat-entry">
+                        <div className="chat-bubble user-message">
+                            <strong>{entry.user}</strong>
+                        </div>
+                        <div className={`chat-bubble bot-message ${!isMessageLoading && index === chatHistory.length - 1 ? "fade-in" : ""}`}>
+                            {isMessageLoading && index === chatHistory.length - 1 ? (
+                                <div className="loading-dots"><span>.</span><span>.</span><span>.</span></div>
+                            ) : (
+                                <span
+                                    dangerouslySetInnerHTML={{ __html: entry.bot }}
+                                    onClick={(e) => {
+                                        const target = e.target as HTMLElement;
+                                        if (target.tagName === "BUTTON") {
+                                            const buttonElement = target as HTMLButtonElement;
+                                            const buttonText = buttonElement.textContent || buttonElement.innerText;
+                                            handleButtonClick(buttonText);
+                                        }
+                                    }}
+                                />
+                            )}
+                        </div>
+                    </div>
+                ))}
             </div>
-          ))}
+            <form className="chat-input-form" onSubmit={sendPrompt}>
+                <textarea
+                    className="chat-input"
+                    rows={2}
+                    placeholder="Amazon Chef at your service...."
+                    name="prompt"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            sendPrompt(e as any);
+                        }
+                    }}
+                />
+                <button
+                    type="submit"
+                    className={`chat-submit-button ${isLoading || !prompt.trim() ? 'disabled' : ''}`}
+                    disabled={!prompt.trim()}
+                >
+                    {isLoading ? (
+                        <div className="loading-dots">
+                            <span>.</span><span>.</span><span>.</span>
+                        </div>
+                    ) : (
+                        '➤'
+                    )}
+                </button>
+            </form>
         </div>
-        <form className="chat-input-form" onSubmit={sendPrompt}>
-          <textarea
-            className="chat-input"
-            rows={2}
-            placeholder="Amazon Chef at your service...."
-            name="prompt"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                sendPrompt(e as any);
-              }
-            }}
-          />
-          <button
-            type="submit"
-            className={`chat-submit-button ${isLoading || !prompt.trim() ? 'disabled' : ''}`}
-            disabled={!prompt.trim()}
-          >
-            {isLoading ? (
-              <div className="loading-dots">
-                <span>.</span><span>.</span><span>.</span>
-              </div>
-            ) : (
-              '➤'
-            )}
-          </button>
-        </form>
-      </div>
     </div>
-  );
+);
 
 
   return (
