@@ -17,40 +17,35 @@ export const handler: Schema["generateHaiku"]["functionHandler"] = async (
     const prompt = event.arguments.prompt;
     const chatHistory = event.arguments.chatHistory ? JSON.parse(event.arguments.chatHistory) : [];
 
-    // Prepare messages for the model
+// Prepare messages for the model
 const messages = [];
 let lastRole: "user" | "assistant" | null = null;
 
 // Add chat history messages
 chatHistory.forEach((entry: { user: string; bot?: string }, index: number) => {
-  // Always start with 'user' for the first message
-  if (index === 0) {
+  // Handle user messages
+  if (entry.user) {
     messages.push({
       role: "user",
       content: [{ type: "text", text: entry.user }]
     });
-    lastRole = "user"; // Set lastRole to user
-  } else {
-    // For subsequent entries, alternate roles
-    const currentRole = lastRole === "user" ? "assistant" : "user";
-    
-    // Add user message
-    if (entry.user) {
-      messages.push({
-        role: "user",
-        content: [{ type: "text", text: entry.user }]
-      });
-    }
+    lastRole = "user"; // Update lastRole to user
 
-    // Add bot message if it exists
+    // Ensure there is a corresponding assistant message if available
     if (entry.bot) {
       messages.push({
         role: "assistant",
         content: [{ type: "text", text: entry.bot }]
       });
+      lastRole = "assistant"; // Update lastRole to assistant
     }
-
-    lastRole = currentRole; // Update lastRole
+  } else if (entry.bot) {
+    // If there's a bot message but no user message, just add the assistant message
+    messages.push({
+      role: "assistant",
+      content: [{ type: "text", text: entry.bot }]
+    });
+    lastRole = "assistant"; // Update lastRole to assistant
   }
 });
 
@@ -60,7 +55,8 @@ messages.push({
   content: [{ type: "text", text: prompt }]
 });
 
-    console.log("Prepared messages:", messages);
+// Log the prepared messages for debugging
+console.log("Prepared messages:", messages);
 
     // Invoke model
     const input = {
