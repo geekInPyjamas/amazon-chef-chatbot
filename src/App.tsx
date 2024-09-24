@@ -98,8 +98,8 @@ export default function App() {
         try {
             const { data, errors } = await client.queries.generateHaiku({
                 prompt,
-                chatHistory: JSON.stringify(updatedChatHistory)
-            });
+                chatHistory: JSON.stringify(updatedChatHistory.filter(entry => entry.bot)),  // Send only complete conversations
+              });
 
             if (!errors) {
                 setChatHistory((prevHistory) => {
