@@ -1,9 +1,9 @@
 {
   "auth": {
-    "user_pool_id": "us-east-1_gNxz7wGVK",
-    "aws_region": "us-east-1",
-    "user_pool_client_id": "nmakhid031rajfqov02edsmbi",
-    "identity_pool_id": "us-east-1:40775cdd-0ada-4cf1-b7b5-413bd14045f7",
+    "user_pool_id": "eu-west-2_5drEfmdid",
+    "aws_region": "eu-west-2",
+    "user_pool_client_id": "27tfc6kn2nt70vdmra42ajib3t",
+    "identity_pool_id": "eu-west-2:7afa52ef-bfb2-4061-9b59-e2c451383af0",
     "mfa_methods": [],
     "standard_required_attributes": [
       "email"
@@ -25,9 +25,9 @@
     "unauthenticated_identities_enabled": true
   },
   "data": {
-    "url": "https://duwuhcjnarb7xpbjhsfs67ucha.appsync-api.us-east-1.amazonaws.com/graphql",
-    "aws_region": "us-east-1",
-    "api_key": "da2-ri3m7wuqirbxnkjxmbhqzl4m2i",
+    "url": "https://55c3clppxvdlxbdbtmoirdb4ty.appsync-api.eu-west-2.amazonaws.com/graphql",
+    "aws_region": "eu-west-2",
+    "api_key": "da2-tgi5ub6hh5bttdzj66vbz2h2pm",
     "default_authorization_type": "API_KEY",
     "authorization_types": [
       "AMAZON_COGNITO_USER_POOLS",
@@ -35,75 +35,31 @@
     ],
     "model_introspection": {
       "version": 1,
-      "models": {
-        "Todo": {
-          "name": "Todo",
-          "fields": {
-            "id": {
-              "name": "id",
-              "isArray": false,
-              "type": "ID",
-              "isRequired": true,
-              "attributes": []
-            },
-            "content": {
-              "name": "content",
+      "models": {},
+      "enums": {},
+      "nonModels": {},
+      "queries": {
+        "generateHaiku": {
+          "name": "generateHaiku",
+          "isArray": false,
+          "type": "String",
+          "isRequired": false,
+          "arguments": {
+            "prompt": {
+              "name": "prompt",
               "isArray": false,
               "type": "String",
-              "isRequired": false,
-              "attributes": []
+              "isRequired": true
             },
-            "createdAt": {
-              "name": "createdAt",
+            "chatHistory": {
+              "name": "chatHistory",
               "isArray": false,
-              "type": "AWSDateTime",
-              "isRequired": false,
-              "attributes": [],
-              "isReadOnly": true
-            },
-            "updatedAt": {
-              "name": "updatedAt",
-              "isArray": false,
-              "type": "AWSDateTime",
-              "isRequired": false,
-              "attributes": [],
-              "isReadOnly": true
+              "type": "String",
+              "isRequired": false
             }
-          },
-          "syncable": true,
-          "pluralName": "Todos",
-          "attributes": [
-            {
-              "type": "model",
-              "properties": {}
-            },
-            {
-              "type": "auth",
-              "properties": {
-                "rules": [
-                  {
-                    "allow": "public",
-                    "provider": "apiKey",
-                    "operations": [
-                      "create",
-                      "update",
-                      "delete",
-                      "read"
-                    ]
-                  }
-                ]
-              }
-            }
-          ],
-          "primaryKeyInfo": {
-            "isCustomPrimaryKey": false,
-            "primaryKeyFieldName": "id",
-            "sortKeyFieldNames": []
           }
         }
-      },
-      "enums": {},
-      "nonModels": {}
+      }
     }
   },
   "version": "1.1"
