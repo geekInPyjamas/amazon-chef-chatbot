@@ -10,7 +10,7 @@ export const MODEL_ID = "anthropic.claude-3-haiku-20240307-v1:0";
 export const generateHaikuFunction = defineFunction({
   entry: "./generateHaiku.ts",
   timeoutSeconds: 600,
-  memoryMB: 256,
+  memoryMB: 1024,
   environment: {
     MODEL_ID,
   },
